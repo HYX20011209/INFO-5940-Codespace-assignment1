@@ -90,3 +90,72 @@ You will receive an individual API Key for class assignments. To prevent acciden
 
 ## Troubleshooting
 - The Jupyter extension should install automatically. If you still cannot select a Python kernel on Jupyter Notebook: Go to the left sidebar >> **Extensions** >> search for **Jupyter** >> reload window (or reinstall it).   
+
+
+---
+
+# Assignment 1 – RAG Document Q&A App
+
+## Overview
+This app implements a Retrieval-Augmented Generation (RAG) workflow with Streamlit for the UI, LangChain for document ingestion and retrieval, and Chroma as the in-memory vector store. Users can upload one or more `.txt` and `.pdf` files and ask questions through a chat interface. Answers are grounded in retrieved document chunks, and the app explicitly says it does not know when the answer is not supported by the provided content.
+
+## Features
+- Upload `.txt` and `.pdf` files; multiple files supported
+- Chunking with `RecursiveCharacterTextSplitter`
+- Embeddings with `text-embedding-3-large`
+- Vector store: Chroma (in-memory)
+- Retrieval: similarity search (top-k=5)
+- Chat UI with multi-turn history and source snippets
+
+## Environment (Codespaces Template)
+- Uses the provided `requirements.txt` and `.devcontainer/`
+- No changes required to the template configuration for this app
+- Python 3.11 (from the template image)
+
+## Quick Start
+1) Set API keys for the current terminal session:
+```bash
+export API_KEY="your_api_key"
+export OPENAI_API_KEY="your_api_key"
+export OPENAI_BASE_URL="https://api.ai.it.cornell.edu"
+```
+2) Run the app:
+```bash
+streamlit run chat_with_pdf.py
+```
+3) Open the forwarded URL in the browser (Codespaces will prompt to open the app).
+
+## How to Use
+1) From the sidebar, upload one or more `.txt` or `.pdf` files.  
+2) Click “Process Documents” to index the files (chunking + embeddings + Chroma).  
+3) Ask questions in the chat input.  
+4) Expand “View Sources” to see the retrieved chunks that grounded the answer.  
+5) Use “Clear Documents” to reset the vector store, and “Clear Chat History” to reset the conversation.
+
+## Design and Architecture
+- Chunking: `chunk_size=500`, `chunk_overlap=50` (balance boundary coherence and recall)
+- Retrieval: similarity search with `k=5`
+- Embeddings: `text-embedding-3-large`
+- LLM: `openai.gpt-4o` via `https://api.ai.it.cornell.edu`
+- Vector Store Lifecycle: in-memory Chroma stored in `st.session_state` to persist across Streamlit reruns
+
+## Configuration and Template Notes
+- Template usage: the app runs in the provided Codespace image without modification.
+- Requirements: using `requirements.txt` from the template.
+- Devcontainer: using `.devcontainer/devcontainer.json` from the template.
+- Main application file: `chat_with_pdf.py`.
+
+## Troubleshooting
+- Invalid model name: ensure the model is `openai.gpt-4o` (not `gpt-4o`).
+- Missing API key: set both `API_KEY` and `OPENAI_API_KEY` before launching.
+
+## Security
+- Do not commit API keys. Use environment variables during development and testing.
+
+## Testing Checklist
+- Single `.txt` file: indexing and QA
+- Single `.pdf` file: indexing and QA
+- Mixed multi-file upload (`.txt + .pdf`)
+- Follow-up questions in a multi-turn chat
+- Out-of-scope questions (“I don’t know” expected)
+- Sidebar controls: “Process Documents”, “Clear Documents”, “Clear Chat History”
